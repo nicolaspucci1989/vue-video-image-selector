@@ -16,14 +16,19 @@ export default {
     }
   },
   methods: {
-    doChange(ev) {
+    async doChange(ev) {
       this.file = ev.target.files[0]
       try {
         const url = window.URL || window.webkitURL
-        if (this.isImage)
+        if (this.isImage) {
           this.src = url.createObjectURL(this.file)
+          const imageData = await this.readImageFromUrl(this.src)
+          console.log(imageData)
+        }
         else if (this.isVideo) {
           this.src = url.createObjectURL(this.file)
+          const videoData = await this.getVideoMetadata(this.$refs.video)
+          console.log(videoData)
           this.$refs.video.load()
         }
       } catch (e) {
@@ -36,6 +41,25 @@ export default {
         reader.onload = e => res(e.target.result)
         reader.onerror = e => rej(e)
         reader.readAsDataURL(file)
+      })
+    },
+    getVideoMetadata(ref) {
+      return new Promise((res) => {
+        ref.onloadedmetadata = (e) => res({
+          width: e.target.videoWidth,
+          height: e.target.videoHeight
+        })
+      })
+    },
+    readImageFromUrl(url) {
+      return new Promise((res, rej) => {
+        const img = new Image()
+        img.onload = () => res({
+          width: img.width,
+          height: img.height
+        })
+        img.onerror = e => rej(e)
+        img.src = url
       })
     }
   }
