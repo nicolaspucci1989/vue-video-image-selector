@@ -4,8 +4,7 @@ export default {
   data(){
     return {
       file: null,
-      imgSrc: '',
-      videoSrc: ''
+      src: '',
     }
   },
   computed: {
@@ -22,9 +21,9 @@ export default {
       try {
         const url = window.URL || window.webkitURL
         if (this.isImage)
-          this.imgSrc = url.createObjectURL(this.file)
+          this.src = url.createObjectURL(this.file)
         else if (this.isVideo) {
-          this.videoSrc = url.createObjectURL(this.file)
+          this.src = url.createObjectURL(this.file)
           this.$refs.video.load()
         }
       } catch (e) {
@@ -49,8 +48,8 @@ export default {
   <label>Select a file </label>
   <input @change="doChange" type="file"/>
   <div>
-    <img v-show="file && isImage" :src="imgSrc" alt="some image"/>
-    <video ref="video" v-show="file && isVideo" :src="videoSrc" type="video/mp4" controls/>
+    <img v-show="file && isImage" :src="src" alt="some image"/>
+    <video ref="video" v-show="file && isVideo" :src="src" type="video/mp4" controls/>
   </div>
 </div>
 </template>
