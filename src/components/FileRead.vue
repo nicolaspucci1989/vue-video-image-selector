@@ -4,21 +4,31 @@ export default {
   data(){
     return {
       file: null,
-      reading: false,
-      imgUrl: ''
+      imgSrc: '',
+      videoSrc: ''
+    }
+  },
+  computed: {
+    isImage() {
+      return this.file.type.startsWith('image')
+    },
+    isVideo() {
+      return this.file.type.startsWith('video')
     }
   },
   methods: {
-    async doChange(ev) {
-      this.file = ev.target.files
+    doChange(ev) {
+      this.file = ev.target.files[0]
       try {
-        this.reading = true
-        const result = await this.readFile(this.file[0])
-        console.log(result)
+        const url = window.URL || window.webkitURL
+        if (this.isImage)
+          this.imgSrc = url.createObjectURL(this.file)
+        else if (this.isVideo) {
+          this.videoSrc = url.createObjectURL(this.file)
+          this.$refs.video.load()
+        }
       } catch (e) {
         console.log(e)
-      } finally {
-        this.reading = false
       }
     },
     readFile(file) {
@@ -38,8 +48,9 @@ export default {
   <div>This is a file selector</div>
   <label>Select a file </label>
   <input @change="doChange" type="file"/>
-  <div v-show="reading">
-    Reading file...
+  <div>
+    <img v-show="file && isImage" :src="imgSrc" alt="some image"/>
+    <video ref="video" v-show="file && isVideo" :src="videoSrc" type="video/mp4" controls/>
   </div>
 </div>
 </template>
