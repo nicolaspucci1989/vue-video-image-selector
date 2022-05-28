@@ -5,6 +5,7 @@ export default {
     return {
       file: null,
       src: '',
+      fileData: {}
     }
   },
   computed: {
@@ -24,12 +25,10 @@ export default {
       this.src = url.createObjectURL(this.file)
       try {
         if (this.isImage) {
-          const imageData = await this.readImageFromUrl(this.src)
-          console.log(imageData)
+          this.fileData = await this.readImageFromUrl(this.src)
         } else if (this.isVideo) {
-          const videoData = await this.getVideoMetadata(this.$refs.video)
+          this.fileData = await this.getVideoMetadata(this.$refs.video)
           this.$refs.video.load()
-          console.log(videoData)
         }
       } catch (e) {
         console.log(e)
@@ -72,6 +71,10 @@ export default {
 <template>
   <div>
     <div>This is a file selector</div>
+    <div>File data</div>
+    <pre>
+      {{ fileData }}
+    </pre>
     <label>Select a file </label>
     <input @change="doChange" type="file"/>
     <div>
