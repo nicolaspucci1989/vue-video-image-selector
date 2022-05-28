@@ -1,7 +1,7 @@
 <script>
 export default {
   name: 'FileReader',
-  data(){
+  data() {
     return {
       file: null,
       src: '',
@@ -17,27 +17,30 @@ export default {
   },
   methods: {
     async doChange(ev) {
+      if (!this.hasFile(ev)) return
+
       this.file = ev.target.files[0]
+      const url = window.URL || window.webkitURL
+      this.src = url.createObjectURL(this.file)
       try {
-        const url = window.URL || window.webkitURL
         if (this.isImage) {
-          this.src = url.createObjectURL(this.file)
           const imageData = await this.readImageFromUrl(this.src)
           console.log(imageData)
-        }
-        else if (this.isVideo) {
-          this.src = url.createObjectURL(this.file)
+        } else if (this.isVideo) {
           const videoData = await this.getVideoMetadata(this.$refs.video)
-          console.log(videoData)
           this.$refs.video.load()
+          console.log(videoData)
         }
       } catch (e) {
         console.log(e)
       }
     },
+    hasFile(ev) {
+      return ev.target.files.length
+    },
     readFile(file) {
       return new Promise((res, rej) => {
-      const reader = new FileReader()
+        const reader = new FileReader()
         reader.onload = e => res(e.target.result)
         reader.onerror = e => rej(e)
         reader.readAsDataURL(file)
@@ -67,13 +70,13 @@ export default {
 </script>
 
 <template>
-<div>
-  <div>This is a file selector</div>
-  <label>Select a file </label>
-  <input @change="doChange" type="file"/>
   <div>
-    <img v-show="file && isImage" :src="src" alt="some image"/>
-    <video ref="video" v-show="file && isVideo" :src="src" type="video/mp4" controls/>
+    <div>This is a file selector</div>
+    <label>Select a file </label>
+    <input @change="doChange" type="file"/>
+    <div>
+      <img v-show="file && isImage" :src="src" alt="some image"/>
+      <video ref="video" v-show="file && isVideo" :src="src" type="video/mp4" controls/>
+    </div>
   </div>
-</div>
 </template>
